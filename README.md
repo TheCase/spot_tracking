@@ -10,7 +10,7 @@
 # Running
 
 ```
-git clone https://github.com/TheCase/spot_cost_tracker && \
+git clone https://github.com/TheCase/spot_tracker && \
 docker-compose up -d && \
 echo "waiting 5 seconds..." && \
 sleep 5 && \
