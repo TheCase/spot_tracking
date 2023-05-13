@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+
+  influxdb:
+    image: influxdb:1.8
+    ports:
+      - '8086:8086'
+    volumes:
+      - ./influxdb:/var/lib/influxdb
+    healthcheck:
+      test: "curl -f http://localhost:8086/ping"
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      #- GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_AUTH_BASIC_ENABLED=false
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_NAME=Main Org.
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+    volumes:
+      - ./provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./dashboards:/dashboards:ro
+    ports:
+      - '3000:3000'
+    depends_on: 
+      influxdb:
+        condition: service_healthy
+
+#  exporter:
+#    build:
+#      context: .
+#    environment:
+#      - "DD_API_KEY:${DD_API_KEY}"
+#      - "AWS_PROFILE:${AWS_PROFILE}"
+#    volumes:
+#      - ~/.aws:/root/.aws:ro
+#    depends_on: 
+#      influxdb:
+#        condition: service_healthy
+
